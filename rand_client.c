@@ -4,63 +4,74 @@
  * as a guideline for developing your own functions.
  */
 
-#include "rand.h"
+#include "rand.h"/*Libreria generada mediante la compilacion del archivo Makefile,
+la cual contiene las funciones necesarias para la llamada de los servicios y 
+conexion con el servidor*/
 
-void rand_prog_1(char *host, long semi, int iter)
+void rand_prog_1(char *host, long semi, int iter)/*Para invocar la funcion requerimos:
+la direccion ip del servidor, la semilla y el numero de iteraciones*/
 {
-	CLIENT *clnt;
-	void *result_1;
-	long inicializa_random_1_arg = semi;
-	int *result_2;
-	char *obtiene_siguiente_random_1_arg;
-	int itera = iter;
-	int i;
+	CLIENT *clnt;/*Puntero el cual contiene la conexion con el servidor*/
+	void *result_1;/*Puntero para guardar el resultado generado por el servidor*/
+	long inicializa_random_1_arg = semi;/*Parametros que usaremos para la llamada de los servicios*/
+	int *result_2;/*Puntero tipo entero, el cual almacenara un resultado*/
+	char *obtiene_siguiente_random_1_arg;/*Puntero utiliazado para obtener el siguiente numero aleatorio*/
+	int itera = iter;/*Asignamos el numero de interaciones que vamos a generar*/
+	int i;/*Variable empleada mas adelante para el ciclo for*/
 
 #ifndef DEBUG
-	clnt = clnt_create(host, RAND_PROG, RAND_VERS, "udp");
-	if (clnt == NULL)
+	clnt = clnt_create(host, RAND_PROG, RAND_VERS, "udp");//Realizamos la conexion con el servidor,
+	//indicando la direccion IP, el programa a usar, la version y el tipo de protocolo
+	if (clnt == NULL)//Si nuestro cliente es igual a vacio
 	{
-		clnt_pcreateerror(host);
+		clnt_pcreateerror(host);//Mostraremos error en la terminal grafica de comandos
 		exit(1);
 	}
 #endif /* DEBUG */
-
+	//Llamamos al servicio: inicializa_random_1, pasando la direccion de memoria del la variable 
+	//inicializa_random_1_arg y nuesto cliente
 	result_1 = inicializa_random_1(&inicializa_random_1_arg, clnt);
-	if (result_1 == (void *)NULL)
+	if (result_1 == (void *)NULL)//Si el puntero es igual a nulo
 	{
-		clnt_perror(clnt, "call failed");
+		clnt_perror(clnt, "call failed");//Imprimiremos el error, en la consola de comandos
 	}
-	for (i = 0; i < itera; i++)
+	for (i = 0; i < itera; i++)//Empleamos un ciclo for, con la finalidad de repetir el servicio
+	//y de esta forma generar la cantidad de numeros aleatorios deseados
 	{
+		//En la variable result_2, asiganaremos el siguiente numero aleatorio generado por el 
+		//programa, llamando al servicio: obtiene_siguiente_random_1, pasando por argumentos
+		//la direccion de memoria de la variable obtiene_siguiente_random_1_arg y realizando 
+		//un cast a tipo puntero vacio, asi como nuestro cliente
 		result_2 = obtiene_siguiente_random_1((void *)&obtiene_siguiente_random_1_arg, clnt);
-		if (result_2 == (int *)NULL)
+		if (result_2 == (int *)NULL)//Si nuestro resultado es vacio
 		{
-			clnt_perror(clnt, "call failed");
+			clnt_perror(clnt, "call failed");//Indicanos el error en la pantalla de comandos
 		}
-		else
+		else//De lo contrario
 		{
 
-			printf("%d : %d\n", i, *result_2);
+			printf("%d : %d\n", i, *result_2);//Mostramos el numero de iteracion y el numero generado
 		}
 	}
 
 #ifndef DEBUG
-	clnt_destroy(clnt);
+	clnt_destroy(clnt);//Destruimos el cliente, una vez que hallamos realizado las llamadas correspondienres los servicios
 #endif /* DEBUG */
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char *argv[])//Funcion principal
 {
-	char *host;
-	int misemilla, itera;
-	if (argc != 4)
+	char *host;//Variable en donde almacenaremos la direccion IP del servidor
+	int misemilla, itera;//Variables tipo entero
+	if (argc != 4)//Validamos que la consola no contenga mas o menos de 4 argumentos
 	{
+		//En caso de no cumplir la condiciion, indicaremos la forma correcta de ejecutar el programa
 		printf("Uso: %s server_host semilla iteraciones\n", argv[0]);
 		exit(1);
 	}
-	host = argv[1];
-	misemilla = (long)atoi(argv[2]);
-	itera = atoi(argv[3]);
-	rand_prog_1(host, misemilla, itera);
-	exit(0);
+	host = argv[1];//Asignamos la dureccion IP, del primer argumento de la consula
+	misemilla = (long)atoi(argv[2]);//Asiganamos la semilla, del seguendo argumento de la consola
+	itera = atoi(argv[3]);//Asigannamos el numero de interaciones, del tercer argumento de la consola
+	rand_prog_1(host, misemilla, itera);//Llamamos al procedimiento
+	exit(0);//Una vez terminado, detenemos y cerramos el programa
 }
