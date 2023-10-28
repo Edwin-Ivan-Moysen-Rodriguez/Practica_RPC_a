@@ -5,19 +5,24 @@
  */
 
 #include "calculadora.h"
-
+//Pograma calculadora, el cual emplea la direccion IP del servidor y
+//dos numeros enteros, utilizados para las operaciones
 void calculadora_prog_1(char *host, int numero1, int numero2)
 {
-	CLIENT *clnt;
-	float *result_1;
+	CLIENT *clnt;//Puntero utilizado para la conexion con el cliente
+	float *result_1;//Variable utilizada par la obteecion de un resultado
+	//Varible estrucutura, empleada para asiganar los numeros para emplear las operaciones deseadas
 	dupla_int suma_1_arg;
-	float *result_2;
+	float *result_2;//Variable utilizada par la obteecion de un resultado
+	//Varible estrucutura, empleada para asiganar los numeros para emplear las operaciones deseadas
 	dupla_int resta_1_arg;
-	float *result_3;
+	float *result_3;//Variable utilizada par la obteecion de un resultado
+	//Varible estrucutura, empleada para asiganar los numeros para emplear las operaciones deseadas
 	dupla_int multiplicacion_1_arg;
-	float *result_4;
+	float *result_4;//Variable utilizada par la obteecion de un resultado
+	//Varible estrucutura, empleada para asiganar los numeros para emplear las operaciones deseadas
 	dupla_int division_1_arg;
-
+	//Asiganamos los numeros a los valores de nuestra estrucura, con los cuales realizaremos las operaciones deseadas
 	suma_1_arg.a = numero1;
 	suma_1_arg.b = numero2;
 
@@ -31,21 +36,24 @@ void calculadora_prog_1(char *host, int numero1, int numero2)
 	division_1_arg.b = numero2;
 
 #ifndef DEBUG
+	//Cremos la conexion con el servidor, el punyero lo asignamos a la variable clnt
 	clnt = clnt_create(host, CALCULADORA_PROG, CALCULADORA_VERS, "udp");
-	if (clnt == NULL)
+	if (clnt == NULL)//Si nuestro puntero es vacio
 	{
-		clnt_pcreateerror(host);
+		clnt_pcreateerror(host);//Mostramos en la terminal grafica de comandos
 		exit(1);
 	}
 #endif /* DEBUG */
-
-	result_1 = suma_1(&suma_1_arg, clnt);
-	if (result_1 == (float *)NULL)
+	//Llmamos al servicio de suma, pasamos la variable estrcutura y nuestro puntero clnt
+	//como referecia
+	result_1 = suma_1(&suma_1_arg, clnt);//El resultado lo asiganremos al punyero result_1
+	if (result_1 == (float *)NULL)//Si el puntero es vacio, significa que hay un error
 	{
-		clnt_perror(clnt, "call failed");
+		clnt_perror(clnt, "call failed");//Mostramos el error en la pantalla grafica de comandos
 	}
-	else
+	else//De lo contrario 
 	{
+		//Imprimimos el resultado en nuestra terminal
 		printf("Resultado SUMA (numero1+numero2): %f\n", *result_1);
 	}
 
@@ -79,24 +87,23 @@ void calculadora_prog_1(char *host, int numero1, int numero2)
 		printf("Resultado DIVISION (numero1/numero2): %f\n",*result_4);
 	}
 #ifndef DEBUG
-	clnt_destroy(clnt);
+	clnt_destroy(clnt);//Una vez realizada las operaciones, destruimos el cliente
 #endif /* DEBUG */
 }
-
+//Funcion principal
 int main(int argc, char *argv[])
 {
-	char *host;
-	int numero1, numero2;
-
+	char *host;//Variable usada para guardar la direccion IP del servidor
+	int numero1, numero2;//Variables usadas, para asiganar los numeros, 
+	//con los cuales realizaremos las operaciones deseadas
 	if (argc != 4)
 	{
 		printf("Uso: %s server_host numero1 numero2\n", argv[0]);
 		exit(1);
 	}
-
-	host = argv[1];
-	numero1 = (long)atoi(argv[2]);
-	numero2 = atoi(argv[3]);
-	calculadora_prog_1(host, numero1, numero2);
-	exit(0);
+	host = argv[1];//Asiganamos la direccion IP
+	numero1 = (long)atoi(argv[2]);//Asiganamos el numero 1
+	numero2 = atoi(argv[3]);//Asoganamos el numero 2
+	calculadora_prog_1(host, numero1, numero2);//Llamamos al programa
+	exit(0);//Terminamos el programa
 }
